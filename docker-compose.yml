@@ -1,0 +1,74 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: quiz_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: quizdb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d quizdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: quiz_redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: quiz_app
+    environment:
+      APP_ENV: production
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@postgres:5432/quizdb
+      REDIS_URL: redis://redis:6379/0
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      LLM_PRIMARY_MODEL: ${LLM_PRIMARY_MODEL:-gpt-4o-mini}
+      LLM_FALLBACK_MODEL: ${LLM_FALLBACK_MODEL:-gpt-4o}
+      LLM_TEMPERATURE: ${LLM_TEMPERATURE:-0.3}
+      LLM_MAX_TOKENS: ${LLM_MAX_TOKENS:-2000}
+      LLM_MAX_RETRIES: ${LLM_MAX_RETRIES:-3}
+      HISTORY_WINDOW_SIZE: ${HISTORY_WINDOW_SIZE:-10}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 1 --log-level info
+
+  # One-off test runner for CI / local validation.
+  test:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: quiz_test
+    environment:
+      APP_ENV: testing
+      DATABASE_URL: sqlite+aiosqlite:///./test_quiz.db
+      REDIS_URL: ""
+      OPENAI_API_KEY: mock
+      USE_MOCK_LLM: "true"
+      LLM_MAX_RETRIES: "2"
+      LLM_RETRY_BASE_DELAY: "0.0"
+    profiles:
+      - test
+    command: pytest -v
+
+volumes:
+  postgres_data:

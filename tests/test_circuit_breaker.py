@@ -19,9 +19,13 @@ async def test_circuit_breaker_opens_after_failures():
 
     # Circuit should now be OPEN.
     assert breaker.state == State.OPEN
-    with pytest.raises(QuizGenerationError) as exc_info:
-        await breaker.call(fail())
-    assert "Circuit breaker is OPEN" in str(exc_info.value)
+    coro = fail()
+    try:
+        with pytest.raises(QuizGenerationError) as exc_info:
+            await breaker.call(coro)
+        assert "Circuit breaker is OPEN" in str(exc_info.value)
+    finally:
+        coro.close()
 
 
 @pytest.mark.asyncio

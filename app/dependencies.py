@@ -3,7 +3,7 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 import redis.asyncio as aioredis
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -50,11 +50,6 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
             raise
         finally:
             await session.close()
-
-
-async def get_redis(request: Request) -> aioredis.Redis | None:
-    """Yield the shared Redis client (or None if not configured)."""
-    return await _get_redis_client()
 
 
 @asynccontextmanager

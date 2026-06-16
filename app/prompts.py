@@ -15,10 +15,6 @@ Design decisions:
 4. Retry augmentation: on validation failure the previous error is added
    to the user prompt so the model can self-correct on the next attempt.
 """
-import json
-from datetime import datetime, timezone
-
-
 SYSTEM_PROMPT = """You are an expert educational quiz designer. Your job is to generate engaging multiple-choice quizzes that teach an academic subject through the lens of a sport.
 
 Rules:
@@ -120,13 +116,3 @@ def build_user_prompt(
     parts.append("Return only valid JSON matching the schema.")
     return "\n\n".join(parts)
 
-
-def build_retry_error_message(error: Exception) -> str:
-    """Normalise an exception into a short correction instruction."""
-    return str(error).replace("\n", " ")
-
-
-def render_example_quiz() -> str:
-    """Render the few-shot example as JSON (used in tests)."""
-    example = json.loads(SYSTEM_PROMPT.split("Few-shot example (baseball + physics + secondary):\n")[1])
-    return json.dumps(example)

@@ -19,7 +19,7 @@ class Question(BaseModel):
 
     @field_validator("correct_answer")
     @classmethod
-    def correct_answer_must_be_an_option(cls, value: str, info) -> str:
+    def correct_answer_must_be_an_option(_cls, value: str, info) -> str:
         options = info.data.get("options") or []
         if options and value not in options:
             raise ValueError("correct_answer must be one of the provided options")
@@ -40,7 +40,7 @@ class Quiz(BaseModel):
 
     @field_validator("questions")
     @classmethod
-    def exactly_three_increasing_difficulty(cls, questions: list[Question]) -> list[Question]:
+    def exactly_three_increasing_difficulty(_cls, questions: list[Question]) -> list[Question]:
         if len(questions) != 3:
             raise ValueError(f"expected exactly 3 questions, got {len(questions)}")
         expected = ["easy", "medium", "hard"]

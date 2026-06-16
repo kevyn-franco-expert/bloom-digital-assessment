@@ -3,10 +3,8 @@
 This module isolates the core generation + validation behaviour so it can be
 imported and tested independently of the full pipeline, persistence, and API.
 """
-from app.config import settings
 from app.exceptions import QuizGenerationError
 from app.llm_client import LLMClient, OpenAILLMClient
-from app.prompts import build_user_prompt
 from app.validator import validate_quiz_dict
 
 

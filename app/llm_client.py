@@ -4,7 +4,6 @@ from __future__ import annotations
 import json
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
-from time import perf_counter
 from typing import Any
 from uuid import uuid4
 
@@ -22,7 +21,7 @@ from openai import OpenAIError
 from app.config import settings
 from app.exceptions import QuizGenerationError
 from app.prompts import SYSTEM_PROMPT, build_user_prompt
-from app.schemas import Quiz, TokenUsage
+from app.schemas import TokenUsage
 
 
 class LLMResponse:

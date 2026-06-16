@@ -1,7 +1,6 @@
 """Tests for the Stage 2 generar_quiz() function."""
 import pytest
 
-from app.exceptions import QuizGenerationError
 from app.generation import generar_quiz
 from app.llm_client import MockLLMClient
 

@@ -5,7 +5,7 @@ from sqlalchemy import select
 from app.exceptions import QuizGenerationError
 from app.llm_client import MockLLMClient
 from app.memory import get_history_context
-from app.models import GeneratedQuiz, StudentHistory
+from app.models import GeneratedQuiz
 from app.pipeline import generate_quiz_pipeline
 
 

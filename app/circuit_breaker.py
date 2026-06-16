@@ -57,7 +57,7 @@ class CircuitBreaker:
             result = await coro
             await self.record_success()
             return result
-        except QuizGenerationError as exc:
+        except QuizGenerationError:
             await self.record_failure()
             raise
 
